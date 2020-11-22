@@ -14,7 +14,8 @@ namespace AllInOneMobile
 
 	public class Ads : Singleton<Ads>
 	{
-
+		// TODO: temp
+		public AllInOneMobileSettings AllInOneMobileSettings;
 		private static bool initialized;
 
 		private void Start()
@@ -29,6 +30,7 @@ namespace AllInOneMobile
 
 			MobileAds.Initialize(initStatus => { });
 			InitializeBanner();
+			InitializeInterstitial();
 			InitializeRewarded();
 			initialized = true;
 		}
@@ -65,16 +67,15 @@ namespace AllInOneMobile
 		private void RequestBanner()
 		{
 #if UNITY_ANDROID
-            string adUnitId = AllInOneMobileSettings.Instance.AndroidBaner;
+            string adUnitId = AllInOneMobileSettings.AndroidBaner;
 #elif UNITY_IPHONE
             string adUnitId = AllInOneMobileSettings.Instance.IOSBaner;
 #else
 			string adUnitId = "unexpected_platform";
 #endif
 
-			// Create a 320x50 banner at the top of the screen.
-			this.bannerView = new BannerView(adUnitId, AdSize.Banner, AdPosition.Top);
-
+			// Create a banner.
+			this.bannerView = new BannerView(adUnitId, AllInOneMobileSettings.bannerSize, AllInOneMobileSettings.adPosition);
 
 			// Called when an ad request has successfully loaded.
 			this.bannerView.OnAdLoaded += this.HandleOnBannerLoaded;
@@ -104,6 +105,42 @@ namespace AllInOneMobile
 			if (!requestedBanner)
 				RequestBanner();
 			this.bannerView.Show();
+		}
+
+		// TODO: delete it
+		public void RequestBanner(AdPosition adPos)
+		{
+#if UNITY_ANDROID
+			string adUnitId = AllInOneMobileSettings.AndroidBaner;
+#elif UNITY_IPHONE
+            string adUnitId = AllInOneMobileSettings.Instance.IOSBaner;
+#else
+			string adUnitId = "unexpected_platform";
+#endif
+			if (bannerView != null)
+				DestroyBanner();
+
+			// Create a banner.
+			this.bannerView = new BannerView(adUnitId, AllInOneMobileSettings.bannerSize, adPos);
+
+			// Called when an ad request has successfully loaded.
+			this.bannerView.OnAdLoaded += this.HandleOnBannerLoaded;
+			// Called when an ad request failed to load.
+			this.bannerView.OnAdFailedToLoad += this.HandleOnBannerFailedToLoad;
+			// Called when an ad is clicked.
+			this.bannerView.OnAdOpening += this.HandleOnBannerOpened;
+			// Called when the user returned from the app after an ad click.
+			this.bannerView.OnAdClosed += this.HandleOnBannerClosed;
+			// Called when the ad click caused the user to leave the application.
+			this.bannerView.OnAdLeavingApplication += this.HandleOnBannerLeavingApplication;
+
+
+			// Create an empty ad request.
+			AdRequest request = new AdRequest.Builder().Build();
+			requestedBanner = true;
+
+			// Load the banner with the request.
+			this.bannerView.LoadAd(request);
 		}
 
 		/// <summary>
@@ -157,32 +194,37 @@ namespace AllInOneMobile
 		/// <summary>
 		/// Called when an interstitial ad is ready to show.
 		/// </summary>
-		public Action OnAdLoaded;
+		public Action OnInterstitialLoaded;
 		/// <summary>
 		/// Called when can't load interstitial ad.
 		/// </summary>
-		public Action OnAdFailedToLoad;
+		public Action OnInterstitialFailedToLoad;
 		/// <summary>
 		/// Called when an interstitial ad is opening - pause game or load async scene here.
 		/// </summary>
-		public Action OnAdOpened;
+		public Action OnInterstitialOpened;
 		/// <summary>
 		/// Called when an interstitial ad is closing - unpause game or open scene.
 		/// </summary>
-		public Action OnAdClosed;
+		public Action OnInterstitialClosed;
 		/// <summary>
 		/// Called when player click an interstitial ad and leave the application.
 		/// </summary>
-		public Action OnAdLeavingApplication;
+		public Action OnInterstitialLeavingApplication;
 
 		private InterstitialAd interstitial;
+
+		private void InitializeInterstitial()
+		{
+			this.RequestInterstitial();
+		}
 
 		// TODO: think when need an ad request 
 		// TODO: reuse interstitial object on android?  https://developers.google.com/admob/unity/interstitial
 		private void RequestInterstitial()
 		{
 #if UNITY_ANDROID
-            string adUnitId = AllInOneMobileSettings.Instance.AndroidInterstitial;
+            string adUnitId = AllInOneMobileSettings.AndroidInterstitial;
 #elif UNITY_IPHONE
             string adUnitId = AllInOneMobileSettings.Instance.IOSInterstitial;
 #else
@@ -212,32 +254,32 @@ namespace AllInOneMobile
 
 		private void HandleOnAdLoaded(object sender, EventArgs args)
 		{
-			OnAdLoaded?.Invoke();
+			OnInterstitialLoaded?.Invoke();
 			MonoBehaviour.print("HandleAdLoaded event received");
 		}
 
 		private void HandleOnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
 		{
-			OnAdFailedToLoad?.Invoke();
+			OnInterstitialFailedToLoad?.Invoke();
 			MonoBehaviour.print("HandleFailedToReceiveAd event received with message: " + args.Message);
 		}
 
 		private void HandleOnAdOpened(object sender, EventArgs args)
 		{
-			OnAdOpened?.Invoke();
+			OnInterstitialOpened?.Invoke();
 			MonoBehaviour.print("HandleAdOpened event received");
 		}
 
 		private void HandleOnAdClosed(object sender, EventArgs args)
 		{
-			OnAdClosed?.Invoke();
+			OnInterstitialClosed?.Invoke();
 			MonoBehaviour.print("HandleAdClosed event received");
 			interstitial.Destroy();	// TODO: check it
 		}
 
 		private void HandleOnAdLeavingApplication(object sender, EventArgs args)
 		{
-			OnAdLeavingApplication?.Invoke();
+			OnInterstitialLeavingApplication?.Invoke();
 			MonoBehaviour.print("HandleAdLeavingApplication event received");
 		}
 
@@ -311,7 +353,7 @@ namespace AllInOneMobile
 		private void RequestRewardBasedVideo()
 		{
 #if UNITY_ANDROID
-            string adUnitId = AllInOneMobileSettings.Instance.IOSRewarded;
+            string adUnitId = AllInOneMobileSettings.androidRewarded;
 #elif UNITY_IPHONE
             string adUnitId = AllInOneMobileSettings.Instance.IOSRewarded;
 #else
@@ -372,6 +414,15 @@ namespace AllInOneMobile
 		{
 			OnRewardedLeavingApplication?.Invoke();
 			MonoBehaviour.print("HandleRewardBasedVideoLeftApplication event received");
+		}
+
+		// TODO: TryShowRewarded()
+		public void ShowRewarded()
+		{
+			if (this.rewardBasedVideo.IsLoaded())
+			{
+				this.rewardBasedVideo.Show();
+			}
 		}
 
 		/// <summary>

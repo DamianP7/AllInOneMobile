@@ -12,11 +12,14 @@ namespace AllInOneMobile
 	{
 		bool adsInstalled = false;
 		const string adsPluginPath = "/Plugins/Android/googlemobileads-unity.aar";
+		bool achievementsInstalled = false;
+		const string achievementsPluginPath = "/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin/project.properties";
 
 		AllInOneMobileSettings settings;
 
 		// -- Tabs
 		AdsTab adsTab;
+		AchievementsTab achievementsTab;
 
 		[SerializeField] string myString = "Hello World";
 
@@ -33,6 +36,9 @@ namespace AllInOneMobile
 			adsInstalled = System.IO.File.Exists(Application.dataPath + adsPluginPath);
 			adsTab.adsInstalled = adsInstalled;
 
+			achievementsInstalled = System.IO.File.Exists(Application.dataPath + achievementsPluginPath);
+			achievementsTab.achievementsInstalled = achievementsInstalled;
+
 			//Debug.Log("oneb");
 		}
 
@@ -41,7 +47,7 @@ namespace AllInOneMobile
 			settings = AllInOneMobileSettings.Instance;
 
 			adsTab = new AdsTab(settings);
-
+			achievementsTab = new AchievementsTab(settings);
 
 			//defaultScale = Time.timeScale;
 
@@ -66,12 +72,15 @@ namespace AllInOneMobile
 			//Time.timeScale = EditorGUILayout.Slider("Time Scale", Time.timeScale, 0, 2);
 			//EditorGUILayout.EndToggleGroup();
 
-			adsTab.ShowAds();
+			adsTab.ShowTab();
+
+			achievementsTab.ShowTab();
 
 
 			if (GUI.changed)
 			{
 				adsTab.Save();
+				achievementsTab.Save();
 
 				//OnSettingsChanged();
 				settings.WriteSettingsToFile();

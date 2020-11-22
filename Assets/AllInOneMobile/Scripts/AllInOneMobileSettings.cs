@@ -32,6 +32,7 @@ namespace AllInOneMobile
 			{
 				if (instance == null)
 				{
+#if UNITY_EDITOR
 					if (!AssetDatabase.IsValidFolder(settingsResourcesDir))
 					{
 						AssetDatabase.CreateFolder(settingsDir, "Resources");
@@ -45,11 +46,14 @@ namespace AllInOneMobile
 						instance = ScriptableObject.CreateInstance<AllInOneMobileSettings>();
 						AssetDatabase.CreateAsset(instance, settingsFile);
 					}
+#endif
 				}
 				return instance;
 			}
 		}
+		#endregion
 
+		#region Ads Settings
 		// TODO: ADS_DEBUG - show errors and warnings (e.x. not setted ids)
 		// TODO: add error to OnApplicationBuild (??) - can't build with some errors
 		public string AndroidBaner
@@ -79,42 +83,14 @@ namespace AllInOneMobile
 #endif
 			set => androidRewarded = value;
 		}
-		public string IOSBaner
-		{
-#if ADS_TEST
-			get => "ca-app-pub-3940256099942544/2934735716";    // Sample ad unit ID
-#else
-			get => iOSBaner;
-#endif
-			set => iOSBaner = value;
-		}
-		public string IOSInterstitial
-		{
-
-#if ADS_TEST
-			get => "ca-app-pub-3940256099942544/4411468910";    // Sample ad unit ID
-#else
-			get => iOSInterstitial;
-#endif
-			set => iOSInterstitial = value;
-		}
-		public string IOSRewarded
-		{
-#if ADS_TEST
-			get => "ca-app-pub-3940256099942544/1712485313";    // Sample ad unit ID
-#else
-			get => iOSRewarded;
-#endif
-			set => iOSRewarded = value;
-		}
 
 		public void WriteSettingsToFile()
 		{
+#if UNITY_EDITOR
 			AssetDatabase.SaveAssets();
+#endif
 		}
-		#endregion
 
-		#region Ads Settings
 		public bool useAdMob = false;
 		public bool useBaner = false;
 		public bool useInterstitial = false;
@@ -125,14 +101,19 @@ namespace AllInOneMobile
 		public string androidInterstitial;
 		public string androidRewarded;
 
-
-		public string iOSID = "";
-		public string iOSBaner;
-		public string iOSInterstitial;
-		public string iOSRewarded;
-
 		public AdSize bannerSize;
 		public AdPosition adPosition;
+		public int minSecondsBetweenAds;
+
+
+		#endregion
+
+		#region Achievements
+
+
+		public bool useAchievements = false;
+
+
 
 
 		#endregion

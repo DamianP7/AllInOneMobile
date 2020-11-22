@@ -70,7 +70,7 @@ namespace AllInOneMobile
 			}
 		}
 
-		public void ShowAds()
+		public void ShowTab()
 		{
 			GUILayout.Label("Ads (AdMob)", EditorStyles.boldLabel);
 			if (!adsInstalled)    // if can't find plugin - download button
@@ -90,11 +90,10 @@ namespace AllInOneMobile
 				{
 					EditorGUI.indentLevel++;
 					settings.androidID = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidID);
-					settings.iOSID = EditorGUILayout.TextField(new GUIContent("iOS ID"), settings.iOSID);
 
-					if (settings.iOSID == "" && settings.androidID == "")
+					if (settings.androidID == "")
 						EditorGUILayout.HelpBox("AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Info);
-					else if (!CheckAdsIDFormat(settings.iOSID) || !CheckAdsIDFormat(settings.androidID))
+					else if (!CheckAdsIDFormat(settings.androidID))
 						EditorGUILayout.HelpBox("AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Error);
 
 					EditorGUI.indentLevel--;
@@ -119,9 +118,10 @@ namespace AllInOneMobile
 					settings.useInterstitial = EditorGUILayout.Toggle(new GUIContent("Interstitials"), settings.useInterstitial);
 					if (settings.useInterstitial)
 					{
-						settings.androidInterstitial = EditorGUILayout.TextField(new GUIContent("Android"), settings.androidInterstitial);
-						settings.iOSInterstitial = EditorGUILayout.TextField(new GUIContent("iOS"), settings.iOSInterstitial);
-
+						settings.androidInterstitial = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidInterstitial);
+						settings.minSecondsBetweenAds = EditorGUILayout.IntField(new GUIContent("Time between ads (s)"), settings.minSecondsBetweenAds);
+						if (settings.minSecondsBetweenAds < 0)
+							settings.minSecondsBetweenAds = 0;
 					}
 					EditorGUI.indentLevel--;
 				}
@@ -133,8 +133,7 @@ namespace AllInOneMobile
 					settings.useRewarded = EditorGUILayout.Toggle(new GUIContent("Rewarded"), settings.useRewarded);
 					if (settings.useRewarded)
 					{
-						settings.androidRewarded = EditorGUILayout.TextField(new GUIContent("Android"), settings.androidRewarded);
-						settings.iOSRewarded = EditorGUILayout.TextField(new GUIContent("iOS"), settings.iOSRewarded);
+						settings.androidRewarded = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidRewarded);
 
 					}
 					EditorGUI.indentLevel--;
@@ -145,9 +144,7 @@ namespace AllInOneMobile
 		private void BannerSettings()
 		{
 			bool disabledFields;
-			settings.androidBaner = EditorGUILayout.TextField(new GUIContent("Android"), settings.androidBaner);
-			settings.iOSBaner = EditorGUILayout.TextField(new GUIContent("iOS"), settings.iOSBaner);
-
+			settings.androidBaner = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidBaner);
 			EditorGUILayout.Separator();
 
 			bannerSize = (BannerSize)EditorGUILayout.EnumPopup("Banner size", bannerSize);
