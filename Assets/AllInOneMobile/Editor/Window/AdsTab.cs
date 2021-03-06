@@ -1,6 +1,4 @@
 ﻿using GoogleMobileAds.Api;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,6 +18,7 @@ namespace AllInOneMobile
 			SmartBanner = 4,
 			Custom = 99
 		}
+
 		public bool adsInstalled = false;
 
 		AllInOneMobileSettings settings;
@@ -36,8 +35,6 @@ namespace AllInOneMobile
 		bool groupEnabled;
 		float defaultScale;
 
-
-
 		public AdsTab(AllInOneMobileSettings settings)
 		{
 			this.settings = settings;
@@ -48,24 +45,22 @@ namespace AllInOneMobile
 			switch (bannerSize)
 			{
 				case BannerSize.Banner:
-					settings.bannerSize = GoogleMobileAds.Api.AdSize.Banner;
+					settings.bannerSize = AdSize.Banner;
 					break;
 				case BannerSize.MediumRectangle:
-					settings.bannerSize = GoogleMobileAds.Api.AdSize.MediumRectangle;
+					settings.bannerSize = AdSize.MediumRectangle;
 					break;
 				case BannerSize.IABBanner:
-					settings.bannerSize = GoogleMobileAds.Api.AdSize.IABBanner;
+					settings.bannerSize = AdSize.IABBanner;
 					break;
 				case BannerSize.Leaderboard:
-					settings.bannerSize = GoogleMobileAds.Api.AdSize.Leaderboard;
+					settings.bannerSize = AdSize.Leaderboard;
 					break;
 				case BannerSize.SmartBanner:
-					settings.bannerSize = GoogleMobileAds.Api.AdSize.SmartBanner;
+					settings.bannerSize = AdSize.SmartBanner;
 					break;
 				case BannerSize.Custom:
-					settings.bannerSize = new GoogleMobileAds.Api.AdSize(bannerWidth, bannerHeight);
-					break;
-				default:
+					settings.bannerSize = new AdSize(bannerWidth, bannerHeight);
 					break;
 			}
 		}
@@ -73,81 +68,92 @@ namespace AllInOneMobile
 		public void ShowTab()
 		{
 			GUILayout.Label("Ads (AdMob)", EditorStyles.boldLabel);
-			if (!adsInstalled)    // if can't find plugin - download button
+			if (!adsInstalled) // if can't find plugin - show download button
 			{
 				if (GUILayout.Button("Download plugin"))
 				{
 					Application.OpenURL("https://github.com/googleads/googleads-mobile-unity/releases/tag/v5.3.0");
 				}
+
 				return;
 			}
+
 			settings.useAdMob = EditorGUILayout.Toggle(new GUIContent("Use AdMob"), settings.useAdMob);
 
-			if (settings.useAdMob)
+			if (!settings.useAdMob) return;
+
+			adIDs = EditorGUILayout.Foldout(adIDs, "Application ID", true);
+			if (adIDs)
 			{
-				adIDs = EditorGUILayout.Foldout(adIDs, "Application ID", true);
-				if (adIDs)
+				EditorGUI.indentLevel++;
+				settings.androidID = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidID);
+
+				if (settings.androidID == "")
+					EditorGUILayout.HelpBox(
+						"AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713",
+						MessageType.Info);
+				else if (!CheckAdsIDFormat(settings.androidID))
+					EditorGUILayout.HelpBox(
+						"AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713",
+						MessageType.Error);
+
+				EditorGUI.indentLevel--;
+			}
+
+			adBaner = EditorGUILayout.Foldout(adBaner, "Baner", true);
+			if (adBaner)
+			{
+				EditorGUI.indentLevel++;
+				settings.useBaner = EditorGUILayout.Toggle(new GUIContent("Baners"), settings.useBaner);
+				if (settings.useBaner)
 				{
-					EditorGUI.indentLevel++;
-					settings.androidID = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidID);
-
-					if (settings.androidID == "")
-						EditorGUILayout.HelpBox("AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Info);
-					else if (!CheckAdsIDFormat(settings.androidID))
-						EditorGUILayout.HelpBox("AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Error);
-
-					EditorGUI.indentLevel--;
+					BannerSettings();
 				}
 
-				adBaner = EditorGUILayout.Foldout(adBaner, "Baner", true);
-				if (adBaner)
+				EditorGUI.indentLevel--;
+			}
+
+			adIntestitial = EditorGUILayout.Foldout(adIntestitial, "Interstitial", true);
+			if (adIntestitial)
+			{
+				EditorGUI.indentLevel++;
+				settings.useInterstitial =
+					EditorGUILayout.Toggle(new GUIContent("Interstitials"), settings.useInterstitial);
+				if (settings.useInterstitial)
 				{
-					EditorGUI.indentLevel++;
-					settings.useBaner = EditorGUILayout.Toggle(new GUIContent("Baners"), settings.useBaner);
-					if (settings.useBaner)
-					{
-						BannerSettings();
-					}
-					EditorGUI.indentLevel--;
+					settings.androidInterstitial =
+						EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidInterstitial);
+					settings.minSecondsBetweenAds = EditorGUILayout.IntField(new GUIContent("Time between ads (s)"),
+						settings.minSecondsBetweenAds);
+					if (settings.minSecondsBetweenAds < 0)
+						settings.minSecondsBetweenAds = 0;
 				}
 
-				adIntestitial = EditorGUILayout.Foldout(adIntestitial, "Interstitial", true);
-				if (adIntestitial)
+				EditorGUI.indentLevel--;
+			}
+
+			adRewarded = EditorGUILayout.Foldout(adRewarded, "Rewarded", true);
+			if (adRewarded)
+			{
+				EditorGUI.indentLevel++;
+				settings.useRewarded = EditorGUILayout.Toggle(new GUIContent("Rewarded"), settings.useRewarded);
+				if (settings.useRewarded)
 				{
-					EditorGUI.indentLevel++;
-					settings.useInterstitial = EditorGUILayout.Toggle(new GUIContent("Interstitials"), settings.useInterstitial);
-					if (settings.useInterstitial)
-					{
-						settings.androidInterstitial = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidInterstitial);
-						settings.minSecondsBetweenAds = EditorGUILayout.IntField(new GUIContent("Time between ads (s)"), settings.minSecondsBetweenAds);
-						if (settings.minSecondsBetweenAds < 0)
-							settings.minSecondsBetweenAds = 0;
-					}
-					EditorGUI.indentLevel--;
+					settings.androidRewarded =
+						EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidRewarded);
 				}
 
-				adRewarded = EditorGUILayout.Foldout(adRewarded, "Rewarded", true);
-				if (adRewarded)
-				{
-					EditorGUI.indentLevel++;
-					settings.useRewarded = EditorGUILayout.Toggle(new GUIContent("Rewarded"), settings.useRewarded);
-					if (settings.useRewarded)
-					{
-						settings.androidRewarded = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidRewarded);
-
-					}
-					EditorGUI.indentLevel--;
-				}
+				EditorGUI.indentLevel--;
 			}
 		}
 
-		private void BannerSettings()
+		void BannerSettings()
 		{
 			bool disabledFields;
 			settings.androidBaner = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidBaner);
 			EditorGUILayout.Separator();
 
-			bannerSize = (BannerSize)EditorGUILayout.EnumPopup("Banner size", bannerSize);
+			bannerSize = (BannerSize) EditorGUILayout.EnumPopup("Banner size", bannerSize);
 			if (bannerSize != BannerSize.Custom)
 			{
 				disabledFields = true;
@@ -156,6 +162,7 @@ namespace AllInOneMobile
 			}
 			else
 				disabledFields = false;
+
 			EditorGUI.BeginDisabledGroup(disabledFields);
 			bannerWidth = EditorGUILayout.IntField("Width", bannerWidth);
 			bannerHeight = EditorGUILayout.IntField("Height", bannerHeight);
@@ -163,7 +170,7 @@ namespace AllInOneMobile
 
 			EditorGUILayout.Separator();
 
-			settings.adPosition = (AdPosition)EditorGUILayout.EnumPopup("Banner position", settings.adPosition);
+			settings.adPosition = (AdPosition) EditorGUILayout.EnumPopup("Banner position", settings.adPosition);
 		}
 
 		Vector2Int GetBannerSize(BannerSize bannerSize)
@@ -209,5 +216,4 @@ namespace AllInOneMobile
 				return true;
 		}
 	}
-
 }

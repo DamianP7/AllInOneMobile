@@ -1,7 +1,4 @@
-﻿using GoogleMobileAds.Api;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace AllInOneMobile
@@ -9,7 +6,7 @@ namespace AllInOneMobile
 	/// <summary>
 	/// Editor's tab responsible for displaying information about achievements.
 	/// </summary>
-	public class AchievementsTab
+	public class AchievementsTab 
 	{
 		public bool achievementsInstalled = false;
 
@@ -25,51 +22,40 @@ namespace AllInOneMobile
 			this.settings = settings;
 		}
 
-		public void Save()
-		{
-
-		}
-
 		public void ShowTab()
 		{
-			GUILayout.Label("Achievements", EditorStyles.boldLabel);
-			if (!achievementsInstalled)    // if can't find plugin - download button
+			settings.useAchievements =
+				EditorGUILayout.Toggle(new GUIContent("Use Achievements & Leaderboards"), settings.useAchievements);
+			
+			if (!settings.useAchievements) return;
+			
+			GUILayout.Label("Achievements & Leaderboards", EditorStyles.boldLabel);
+			if (!achievementsInstalled) // if can't find plugin - download button
 			{
 				if (GUILayout.Button("Download plugin"))
 				{
 					Application.OpenURL("https://github.com/playgameservices/play-games-plugin-for-unity");
 				}
+
 				return;
 			}
-			settings.useAchievements = EditorGUILayout.Toggle(new GUIContent("Use Achievements"), settings.useAchievements);
-
-			if (settings.useAchievements)
+			
+			adIDs = EditorGUILayout.Foldout(adIDs, "Application ID", true);
+			if (adIDs)
 			{
-				adIDs = EditorGUILayout.Foldout(adIDs, "Application ID", true);
-				if (adIDs)
-				{
-					EditorGUI.indentLevel++;
-					settings.androidID = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidID);
+				EditorGUI.indentLevel++;
+				settings.androidID = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidID);
 
-					if (settings.androidID == "")
-						EditorGUILayout.HelpBox("AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Info);
-					else if (!CheckAdsIDFormat(settings.androidID))
-						EditorGUILayout.HelpBox("AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Error);
+				if (settings.androidID == "")
+					EditorGUILayout.HelpBox(
+						"AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713",
+						MessageType.Info);
+				else if (!CheckAdsIDFormat(settings.androidID))
+					EditorGUILayout.HelpBox(
+						"AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713",
+						MessageType.Error);
 
-					EditorGUI.indentLevel--;
-				}
-
-				//adBaner = EditorGUILayout.Foldout(adBaner, "Baner", true);
-				//if (adBaner)
-				//{
-				//	EditorGUI.indentLevel++;
-				//	settings.useBaner = EditorGUILayout.Toggle(new GUIContent("Baners"), settings.useBaner);
-				//	if (settings.useBaner)
-				//	{
-				//		BannerSettings();
-				//	}
-				//	EditorGUI.indentLevel--;
-				//}
+				EditorGUI.indentLevel--;
 			}
 		}
 
@@ -90,6 +76,7 @@ namespace AllInOneMobile
 			else
 				return true;
 		}
-	}
+		//
 
+	}
 }

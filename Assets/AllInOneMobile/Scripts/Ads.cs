@@ -1,7 +1,5 @@
 ﻿using GoogleMobileAds.Api;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace AllInOneMobile
@@ -14,11 +12,10 @@ namespace AllInOneMobile
 
 	public class Ads : Singleton<Ads>
 	{
-		// TODO: temp
-		public AllInOneMobileSettings AllInOneMobileSettings;
-		private static bool initialized;
+		static bool initialized;
+		AllInOneMobileSettings AllInOneMobileSettings = AllInOneMobileSettings.Instance;
 
-		private void Start()
+		void Start()
 		{
 			Initialize();
 		}
@@ -34,6 +31,7 @@ namespace AllInOneMobile
 			InitializeRewarded();
 			initialized = true;
 		}
+		
 		#region Banner
 		/// <summary>
 		/// Called when a banner is ready to show.
@@ -56,37 +54,35 @@ namespace AllInOneMobile
 		/// </summary>
 		public Action OnBannerLeavingApplication;
 
-		private BannerView bannerView;
-		private bool requestedBanner = false;
+		BannerView bannerView;
+		bool requestedBanner = false;
 
-		private void InitializeBanner()
+		void InitializeBanner()
 		{
-			this.RequestBanner();
+			RequestBanner();
 		}
 
-		private void RequestBanner()
+		public void RequestBanner()
 		{
 #if UNITY_ANDROID
             string adUnitId = AllInOneMobileSettings.AndroidBaner;
-#elif UNITY_IPHONE
-            string adUnitId = AllInOneMobileSettings.Instance.IOSBaner;
 #else
 			string adUnitId = "unexpected_platform";
 #endif
 
 			// Create a banner.
-			this.bannerView = new BannerView(adUnitId, AllInOneMobileSettings.bannerSize, AllInOneMobileSettings.adPosition);
+			bannerView = new BannerView(adUnitId, AllInOneMobileSettings.bannerSize, AllInOneMobileSettings.adPosition);
 
 			// Called when an ad request has successfully loaded.
-			this.bannerView.OnAdLoaded += this.HandleOnBannerLoaded;
+			bannerView.OnAdLoaded += this.HandleOnBannerLoaded;
 			// Called when an ad request failed to load.
-			this.bannerView.OnAdFailedToLoad += this.HandleOnBannerFailedToLoad;
+			bannerView.OnAdFailedToLoad += this.HandleOnBannerFailedToLoad;
 			// Called when an ad is clicked.
-			this.bannerView.OnAdOpening += this.HandleOnBannerOpened;
+			bannerView.OnAdOpening += this.HandleOnBannerOpened;
 			// Called when the user returned from the app after an ad click.
-			this.bannerView.OnAdClosed += this.HandleOnBannerClosed;
+			bannerView.OnAdClosed += this.HandleOnBannerClosed;
 			// Called when the ad click caused the user to leave the application.
-			this.bannerView.OnAdLeavingApplication += this.HandleOnBannerLeavingApplication;
+			bannerView.OnAdLeavingApplication += this.HandleOnBannerLeavingApplication;
 
 
 			// Create an empty ad request.
@@ -104,11 +100,10 @@ namespace AllInOneMobile
 		{
 			if (!requestedBanner)
 				RequestBanner();
-			this.bannerView.Show();
+			bannerView.Show();
 		}
 
-		// TODO: delete it
-		public void RequestBanner(AdPosition adPos)
+		public void RequestBanner(AdPosition adPos = AdPosition.Bottom)
 		{
 #if UNITY_ANDROID
 			string adUnitId = AllInOneMobileSettings.AndroidBaner;
@@ -121,7 +116,8 @@ namespace AllInOneMobile
 				DestroyBanner();
 
 			// Create a banner.
-			this.bannerView = new BannerView(adUnitId, AllInOneMobileSettings.bannerSize, adPos);
+			this.bannerView = new BannerView(adUnitId, AdSize.Banner, adPos);
+			//this.bannerView = new BannerView(adUnitId, AllInOneMobileSettings.bannerSize, adPos);
 
 			// Called when an ad request has successfully loaded.
 			this.bannerView.OnAdLoaded += this.HandleOnBannerLoaded;
@@ -148,7 +144,7 @@ namespace AllInOneMobile
 		/// </summary>
 		public void HideBanner()
 		{
-			this.bannerView.Hide();
+			bannerView.Hide();
 		}
 
 		/// <summary>
@@ -159,34 +155,34 @@ namespace AllInOneMobile
 			this.bannerView.Destroy();
 		}
 
-		private void HandleOnBannerLoaded(object sender, EventArgs args)
+		void HandleOnBannerLoaded(object sender, EventArgs args)
 		{
 			OnBannerLoaded?.Invoke();
-			MonoBehaviour.print("HandleAdLoaded event received");
+			Debug.Log("HandleAdLoaded event received");
 		}
 
-		private void HandleOnBannerFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+		void HandleOnBannerFailedToLoad(object sender, AdFailedToLoadEventArgs args)
 		{
 			OnBannerFailedToLoad?.Invoke();
-			MonoBehaviour.print("HandleFailedToReceiveAd event received with message: "	+ args.Message);
+			Debug.Log("HandleFailedToReceiveAd event received with message: "	+ args.Message);
 		}
 
-		private void HandleOnBannerOpened(object sender, EventArgs args)
+		void HandleOnBannerOpened(object sender, EventArgs args)
 		{
 			OnBannerOpened?.Invoke();
-			MonoBehaviour.print("HandleAdOpened event received");
+			Debug.Log("HandleAdOpened event received");
 		}
 
-		private void HandleOnBannerClosed(object sender, EventArgs args)
+		void HandleOnBannerClosed(object sender, EventArgs args)
 		{
 			OnBannerClosed?.Invoke();
-			MonoBehaviour.print("HandleAdClosed event received");
+			Debug.Log("HandleAdClosed event received");
 		}
 
-		private void HandleOnBannerLeavingApplication(object sender, EventArgs args)
+		void HandleOnBannerLeavingApplication(object sender, EventArgs args)
 		{
 			OnBannerLeavingApplication?.Invoke();
-			MonoBehaviour.print("HandleAdLeavingApplication event received");
+			Debug.Log("HandleAdLeavingApplication event received");
 		}
 		#endregion
 
@@ -212,21 +208,17 @@ namespace AllInOneMobile
 		/// </summary>
 		public Action OnInterstitialLeavingApplication;
 
-		private InterstitialAd interstitial;
+		InterstitialAd interstitial;
 
-		private void InitializeInterstitial()
+		void InitializeInterstitial()
 		{
 			this.RequestInterstitial();
 		}
 
-		// TODO: think when need an ad request 
-		// TODO: reuse interstitial object on android?  https://developers.google.com/admob/unity/interstitial
-		private void RequestInterstitial()
+		void RequestInterstitial()
 		{
 #if UNITY_ANDROID
             string adUnitId = AllInOneMobileSettings.AndroidInterstitial;
-#elif UNITY_IPHONE
-            string adUnitId = AllInOneMobileSettings.Instance.IOSInterstitial;
 #else
 			string adUnitId = "unexpected_platform";
 #endif
@@ -248,48 +240,46 @@ namespace AllInOneMobile
 			// Create an empty ad request.
 			AdRequest request = new AdRequest.Builder().Build();
 			// Load the interstitial with the request.
-			this.interstitial.LoadAd(request);
-
+			interstitial.LoadAd(request);
 		}
 
-		private void HandleOnAdLoaded(object sender, EventArgs args)
+		void HandleOnAdLoaded(object sender, EventArgs args)
 		{
 			OnInterstitialLoaded?.Invoke();
-			MonoBehaviour.print("HandleAdLoaded event received");
+			Debug.Log("HandleAdLoaded event received");
 		}
 
-		private void HandleOnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+		void HandleOnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
 		{
 			OnInterstitialFailedToLoad?.Invoke();
-			MonoBehaviour.print("HandleFailedToReceiveAd event received with message: " + args.Message);
+			Debug.Log("HandleFailedToReceiveAd event received with message: " + args.Message);
 		}
 
-		private void HandleOnAdOpened(object sender, EventArgs args)
+		void HandleOnAdOpened(object sender, EventArgs args)
 		{
 			OnInterstitialOpened?.Invoke();
-			MonoBehaviour.print("HandleAdOpened event received");
+			Debug.Log("HandleAdOpened event received");
 		}
 
-		private void HandleOnAdClosed(object sender, EventArgs args)
+		void HandleOnAdClosed(object sender, EventArgs args)
 		{
 			OnInterstitialClosed?.Invoke();
-			MonoBehaviour.print("HandleAdClosed event received");
-			interstitial.Destroy();	// TODO: check it
+			Debug.Log("HandleAdClosed event received");
+			interstitial.Destroy();
 		}
 
-		private void HandleOnAdLeavingApplication(object sender, EventArgs args)
+		void HandleOnAdLeavingApplication(object sender, EventArgs args)
 		{
 			OnInterstitialLeavingApplication?.Invoke();
-			MonoBehaviour.print("HandleAdLeavingApplication event received");
+			Debug.Log("HandleAdLeavingApplication event received");
 		}
 
-		// TODO: TryShowIntestitial()
 		public void ShowInterstitial()
 		{
-			if (this.interstitial.IsLoaded())
-			{
-				this.interstitial.Show();
-			}
+			if(interstitial == null)
+				RequestInterstitial();
+			if (interstitial.IsLoaded())
+				interstitial.Show();
 		}
 
 		#endregion
@@ -324,13 +314,13 @@ namespace AllInOneMobile
 		/// </summary>
 		public Action OnRewardedLeavingApplication;
 
-		private Reward reward;
-		private RewardBasedVideoAd rewardBasedVideo;
+		Reward reward;
+		RewardBasedVideoAd rewardBasedVideo;
 
-		private void InitializeRewarded()
+		void InitializeRewarded()
 		{
 			// Get singleton reward based video ad reference.
-			this.rewardBasedVideo = RewardBasedVideoAd.Instance;
+			rewardBasedVideo = RewardBasedVideoAd.Instance;
 
 			// Called when an ad request has successfully loaded.
 			rewardBasedVideo.OnAdLoaded += HandleRewardBasedVideoLoaded;
@@ -347,15 +337,13 @@ namespace AllInOneMobile
 			// Called when the ad click caused the user to leave the application.
 			rewardBasedVideo.OnAdLeavingApplication += HandleRewardBasedVideoLeftApplication;
 
-			this.RequestRewardBasedVideo();
+			RequestRewardBasedVideo();
 		}
 
-		private void RequestRewardBasedVideo()
+		void RequestRewardBasedVideo()
 		{
 #if UNITY_ANDROID
             string adUnitId = AllInOneMobileSettings.androidRewarded;
-#elif UNITY_IPHONE
-            string adUnitId = AllInOneMobileSettings.Instance.IOSRewarded;
 #else
 			string adUnitId = "unexpected_platform";
 #endif
@@ -363,42 +351,42 @@ namespace AllInOneMobile
 			// Create an empty ad request.
 			AdRequest request = new AdRequest.Builder().Build();
 			// Load the rewarded video ad with the request.
-			this.rewardBasedVideo.LoadAd(request, adUnitId);
+			rewardBasedVideo.LoadAd(request, adUnitId);
 		}
 
-		private void HandleRewardBasedVideoLoaded(object sender, EventArgs args)
+		void HandleRewardBasedVideoLoaded(object sender, EventArgs args)
 		{
 			OnRewardedLoaded?.Invoke();
-			MonoBehaviour.print("HandleRewardBasedVideoLoaded event received");
+			Debug.Log("HandleRewardBasedVideoLoaded event received");
 		}
 
-		private void HandleRewardBasedVideoFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+		void HandleRewardBasedVideoFailedToLoad(object sender, AdFailedToLoadEventArgs args)
 		{
 			OnRewardedFailedToLoad?.Invoke();
-			MonoBehaviour.print("HandleRewardBasedVideoFailedToLoad event received with message: " + args.Message);
+			Debug.Log("HandleRewardBasedVideoFailedToLoad event received with message: " + args.Message);
 		}
 
-		private void HandleRewardBasedVideoOpened(object sender, EventArgs args)
+		void HandleRewardBasedVideoOpened(object sender, EventArgs args)
 		{
 			OnRewardedOpened?.Invoke();
-			MonoBehaviour.print("HandleRewardBasedVideoOpened event received");
+			Debug.Log("HandleRewardBasedVideoOpened event received");
 		}
 
-		private void HandleRewardBasedVideoStarted(object sender, EventArgs args)
+		void HandleRewardBasedVideoStarted(object sender, EventArgs args)
 		{
 			OnRewardedStarted?.Invoke();
-			MonoBehaviour.print("HandleRewardBasedVideoStarted event received");
+			Debug.Log("HandleRewardBasedVideoStarted event received");
 		}
 
-		private void HandleRewardBasedVideoClosed(object sender, EventArgs args)
+		void HandleRewardBasedVideoClosed(object sender, EventArgs args)
 		{
 			OnRewardedClosed?.Invoke();
 
-			this.RequestRewardBasedVideo();
-			MonoBehaviour.print("HandleRewardBasedVideoClosed event received");
+			RequestRewardBasedVideo();
+			Debug.Log("HandleRewardBasedVideoClosed event received");
 		}
 
-		private void HandleRewardBasedVideoRewarded(object sender, GoogleMobileAds.Api.Reward args)
+		void HandleRewardBasedVideoRewarded(object sender, GoogleMobileAds.Api.Reward args)
 		{
 			reward.amount = args.Amount;
 			reward.type = args.Type;
@@ -407,22 +395,21 @@ namespace AllInOneMobile
 
 			string type = args.Type;
 			double amount = args.Amount;
-			MonoBehaviour.print("HandleRewardBasedVideoRewarded event received for " + amount.ToString() + " " + type);
+			Debug.Log("HandleRewardBasedVideoRewarded event received for " + amount.ToString() + " " + type);
 		}
 
-		private void HandleRewardBasedVideoLeftApplication(object sender, EventArgs args)
+		void HandleRewardBasedVideoLeftApplication(object sender, EventArgs args)
 		{
 			OnRewardedLeavingApplication?.Invoke();
-			MonoBehaviour.print("HandleRewardBasedVideoLeftApplication event received");
+			Debug.Log("HandleRewardBasedVideoLeftApplication event received");
 		}
 
-		// TODO: TryShowRewarded()
 		public void ShowRewarded()
 		{
-			if (this.rewardBasedVideo.IsLoaded())
-			{
-				this.rewardBasedVideo.Show();
-			}
+			if(rewardBasedVideo == null)
+				RequestRewardBasedVideo();
+			if (rewardBasedVideo.IsLoaded())
+				rewardBasedVideo.Show();
 		}
 
 		/// <summary>
@@ -455,9 +442,3 @@ namespace AllInOneMobile
 	#endregion
 	}
 }
-
-// https://developers.google.com/admob/unity/interstitial
-
-
-
-	// TODO: Create ad manager on scene (sub-menu)

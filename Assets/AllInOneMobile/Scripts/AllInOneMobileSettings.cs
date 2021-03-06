@@ -1,31 +1,22 @@
-﻿using GoogleMobileAds.Api;
-using System.Collections;
+﻿using System;
+using GoogleMobileAds.Api;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-/*
- * Define ADS_TEST to test ads.
- * This is really important, because testing with real ads is against AdMob policy
- * 
- * 
- * 
- * 
- * 
- */
+using UnityEngine.Purchasing;
 
 namespace AllInOneMobile
 {
-
 	public class AllInOneMobileSettings : ScriptableObject
 	{
-		#region Instance
-		private const string settingsDir = "Assets/AllInOneMobile";
-		private const string settingsResourcesDir = "Assets/AllInOneMobile/Resources";
-		private const string settingsFile = "Assets/AllInOneMobile/Resources/AllInOneMobileSettings.asset";
+#region Instance
+		const string settingsDir = "Assets/AllInOneMobile";
+		const string settingsResourcesDir = "Assets/AllInOneMobile/Resources";
+		const string settingsFile = "Assets/AllInOneMobile/Resources/AllInOneMobileSettings.asset";
+		const string googleAdsSettings = "Assets/GoogleMobileAds/Resources/GoogleMobileAdsSettings.asset";
+		
+		static AllInOneMobileSettings instance;
 
-		private const string googleAdsSettings = "Assets/GoogleMobileAds/Resources/GoogleMobileAdsSettings.asset";
-
-		private static AllInOneMobileSettings instance;
 		public static AllInOneMobileSettings Instance
 		{
 			get
@@ -38,24 +29,33 @@ namespace AllInOneMobile
 						AssetDatabase.CreateFolder(settingsDir, "Resources");
 					}
 
-					instance = (AllInOneMobileSettings)AssetDatabase.LoadAssetAtPath(
+					instance = (AllInOneMobileSettings) AssetDatabase.LoadAssetAtPath(
 						settingsFile, typeof(AllInOneMobileSettings));
 
 					if (instance == null)
 					{
-						instance = ScriptableObject.CreateInstance<AllInOneMobileSettings>();
+						instance = CreateInstance<AllInOneMobileSettings>();
 						AssetDatabase.CreateAsset(instance, settingsFile);
 					}
 #endif
 				}
+
 				return instance;
 			}
 		}
-		#endregion
 
-		#region Ads Settings
-		// TODO: ADS_DEBUG - show errors and warnings (e.x. not setted ids)
-		// TODO: add error to OnApplicationBuild (??) - can't build with some errors
+		public void Save()
+		{
+#if UNITY_EDITOR
+			EditorUtility.SetDirty(this);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+#endif
+		}
+
+#endregion
+
+#region Ads Settings
 		public string AndroidBaner
 		{
 #if ADS_TEST
@@ -65,6 +65,7 @@ namespace AllInOneMobile
 #endif
 			set => androidBaner = value;
 		}
+
 		public string AndroidInterstitial
 		{
 #if ADS_TEST
@@ -74,6 +75,7 @@ namespace AllInOneMobile
 #endif
 			set => androidInterstitial = value;
 		}
+
 		public string AndroidRewarded
 		{
 #if ADS_TEST
@@ -82,13 +84,6 @@ namespace AllInOneMobile
 			get => androidRewarded;
 #endif
 			set => androidRewarded = value;
-		}
-
-		public void WriteSettingsToFile()
-		{
-#if UNITY_EDITOR
-			AssetDatabase.SaveAssets();
-#endif
 		}
 
 		public bool useAdMob = false;
@@ -105,17 +100,27 @@ namespace AllInOneMobile
 		public AdPosition adPosition;
 		public int minSecondsBetweenAds;
 
+#endregion
 
-		#endregion
-
-		#region Achievements
-
+#region Achievements
 
 		public bool useAchievements = false;
 
+#endregion
 
+#region InAppPurchases
 
+		public bool useInAppPurchases = false;
+		public List<InAppProduct> products;
 
-		#endregion
+#endregion
+	}
+
+	[Serializable]
+	public class InAppProduct
+	{
+		public string name;
+		public string id;
+		public ProductType productType;
 	}
 }

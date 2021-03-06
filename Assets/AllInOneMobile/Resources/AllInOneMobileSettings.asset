@@ -12,6 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1c439aafae66364a8fc6c215e858aa7, type: 3}
   m_Name: AllInOneMobileSettings
   m_EditorClassIdentifier: 
-  useAdMob: 0
-  androidID: 
-  iOSID: 
+  useAdMob: 1
+  useBaner: 1
+  useInterstitial: 1
+  useRewarded: 1
+  androidID: ca-app-pub-7227996699216990~1803354846
+  androidBaner: ca-app-pub-7227996699216990/3796105121
+  androidInterstitial: ca-app-pub-7227996699216990/2483023450
+  androidRewarded: ca-app-pub-7227996699216990/3157810875
+  adPosition: 0
+  minSecondsBetweenAds: 0
+  useAchievements: 1
+  useInAppPurchases: 1
+  products:
+  - name: Przedmiot
+    id: consumable
+    productType: 0
+  - name: Premium
+    id: 'non_consumable '
+    productType: 1
+  - name: Subskrypcja
+    id: subscription
+    productType: 2

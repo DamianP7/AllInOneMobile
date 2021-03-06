@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace AllInOneMobile
@@ -14,24 +12,26 @@ namespace AllInOneMobile
 		const string adsPluginPath = "/Plugins/Android/googlemobileads-unity.aar";
 		bool achievementsInstalled = false;
 		const string achievementsPluginPath = "/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin/project.properties";
-
+		bool inAppPurchasesInstalled = false;
+		const string inAppPurchasesPath = "/Plugins/UnityPurchasing/Bin/Stores.dll";
+		bool analyticsInstalled = false;
+		const string analyticsPath = "/Firebase/Plugins/Firebase.Analytics.dll";
+		
 		AllInOneMobileSettings settings;
 
-		// -- Tabs
 		AdsTab adsTab;
 		AchievementsTab achievementsTab;
-
-		[SerializeField] string myString = "Hello World";
+		InAppStoreTab inAppStoreTab;
+		AnalyticsTab analyticsTab;
 
 		#region Open/Close
 		[MenuItem("AllInOne Mobile/Main Settings")]
 		public static void ShowWindow()
 		{
-			EditorWindow.GetWindow(typeof(MainWindow), false, "AllInOne Mobile Settings");
-			//DebugWindow window = (DebugWindow)EditorWindow.GetWindow(typeof(DebugWindow), true, "My Empty Window");
+			GetWindow(typeof(MainWindow), false, "AllInOne Mobile Settings");
 		}
 
-		private void OnFocus()
+		void OnFocus()
 		{
 			adsInstalled = System.IO.File.Exists(Application.dataPath + adsPluginPath);
 			adsTab.adsInstalled = adsInstalled;
@@ -39,7 +39,12 @@ namespace AllInOneMobile
 			achievementsInstalled = System.IO.File.Exists(Application.dataPath + achievementsPluginPath);
 			achievementsTab.achievementsInstalled = achievementsInstalled;
 
-			//Debug.Log("oneb");
+			inAppPurchasesInstalled = System.IO.File.Exists(Application.dataPath + inAppPurchasesPath);
+			inAppStoreTab.inappsInstalled = inAppPurchasesInstalled;
+
+			analyticsInstalled = System.IO.File.Exists(Application.dataPath + analyticsPath);
+			analyticsTab.analyticsInstalled = analyticsInstalled;
+
 		}
 
 		protected void OnEnable()
@@ -48,20 +53,9 @@ namespace AllInOneMobile
 
 			adsTab = new AdsTab(settings);
 			achievementsTab = new AchievementsTab(settings);
-
-			//defaultScale = Time.timeScale;
-
-			//var data = EditorPrefs.GetString("Debugger", JsonUtility.ToJson(this, false));
-			//JsonUtility.FromJsonOverwrite(data, this);
+			inAppStoreTab = new InAppStoreTab(settings);
+			analyticsTab = new AnalyticsTab(settings);
 		}
-
-		//protected void OnDisable()
-		//{
-		//	Time.timeScale = defaultScale;
-
-		//	var data = JsonUtility.ToJson(this, false);
-		//	EditorPrefs.SetString("Debugger", data);
-		//}
 		#endregion
 
 		void OnGUI()
@@ -75,18 +69,14 @@ namespace AllInOneMobile
 			adsTab.ShowTab();
 
 			achievementsTab.ShowTab();
-
+			
+			inAppStoreTab.ShowTab();
 
 			if (GUI.changed)
 			{
 				adsTab.Save();
-				achievementsTab.Save();
-
-				//OnSettingsChanged();
-				settings.WriteSettingsToFile();
+				settings.Save();
 			}
 		}
-
-		
 	}
 }

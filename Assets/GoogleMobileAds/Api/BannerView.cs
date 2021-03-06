@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-
 using GoogleMobileAds;
 using GoogleMobileAds.Common;
 
@@ -152,11 +151,11 @@ namespace GoogleMobileAds.Api
                     this.OnPaidEvent(this, args);
                 }
             };
-
         }
 
         // Returns the mediation adapter class name.
-        [Obsolete("MediationAdapterClassName() is deprecated, use GetResponseInfo.MediationAdapterClassName() instead.")]
+        [Obsolete(
+            "MediationAdapterClassName() is deprecated, use GetResponseInfo.MediationAdapterClassName() instead.")]
         public string MediationAdapterClassName()
         {
             return this.client.MediationAdapterClassName();
@@ -166,7 +165,6 @@ namespace GoogleMobileAds.Api
         public ResponseInfo GetResponseInfo()
         {
             return new ResponseInfo(this.client.GetResponseInfoClient());
-
         }
     }
 }
