@@ -2,9 +2,8 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Purchasing;
 
-namespace AllInOneMobile
+namespace AllInOneMobile.Editor
 {
 	public class InAppStoreTab
 	{
@@ -26,26 +25,25 @@ namespace AllInOneMobile
 
 		public void ShowTab()
 		{
-			GUILayout.Label("In-App Purchases", EditorStyles.boldLabel);
+			settings.useInAppPurchases =
+				EditorGUILayout.Toggle(new GUIContent("Enable InApp-Purchases"), settings.useInAppPurchases);
+			
+			if (!settings.useInAppPurchases) return;
+			
 			if (!inappsInstalled)
 			{
 				EditorGUILayout.HelpBox(
-					"First you must enable Unity In-App Purchasing in Window/Services",
+					"First you need to enable Unity In-App Purchasing in Window/Services",
 					MessageType.Error);
 
 				return;
 			}
 
-			settings.useInAppPurchases =
-				EditorGUILayout.Toggle(new GUIContent("Use InApp-Purchases"), settings.useInAppPurchases);
-
-			if (!settings.useAchievements) return;
-
 			products = EditorGUILayout.Foldout(products, "Products", true);
 			if (products)
 			{
 				EditorGUI.indentLevel++;
-				
+
 				for (int i = 0; i < settings.products.Count; i++)
 				{
 					EditorGUILayout.BeginVertical();
@@ -54,8 +52,12 @@ namespace AllInOneMobile
 					settings.products[i].id = EditorGUILayout.TextField(new GUIContent("ID"),
 						settings.products[i].id);
 					EditorGUILayout.BeginHorizontal();
+#if UNITY_PURCHASING
 					settings.products[i].productType =
-						(ProductType) EditorGUILayout.EnumPopup("Type", settings.products[i].productType, GUILayout.Width(300));
+						(UnityEngine.Purchasing.ProductType) EditorGUILayout.EnumPopup("Type",
+							settings.products[i].productType,
+							GUILayout.Width(300));
+#endif
 					if (GUILayout.Button("-", GUILayout.Width(20)))
 					{
 						settings.products.RemoveAt((i));
@@ -80,9 +82,8 @@ namespace AllInOneMobile
 
 				EditorGUI.indentLevel--;
 			}
-			
 		}
-		
+
 		void GenerateProducts()
 		{
 			if (settings.products == null || settings.products.Count == 0)
@@ -101,11 +102,13 @@ namespace AllInOneMobile
 					Debug.LogError("Empty id!");
 					return;
 				}
+
 				enumEntries[i] = settings.products[i].name.Replace(' ', '_');
 			}
+
 			string filePathAndName =
 				"Assets/AllInOneMobile/Enums/" + enumName + ".cs";
-		
+
 			using (StreamWriter streamWriter = new StreamWriter(filePathAndName))
 			{
 				streamWriter.WriteLine("public enum " + enumName);
@@ -114,10 +117,10 @@ namespace AllInOneMobile
 				{
 					streamWriter.WriteLine("\t" + enumEntries[i] + ",");
 				}
-		
+
 				streamWriter.WriteLine("}");
 			}
-		
+
 			AssetDatabase.Refresh();
 		}
 	}

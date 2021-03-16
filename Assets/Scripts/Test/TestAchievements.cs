@@ -2,24 +2,24 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestAch : MonoBehaviour
+public class TestAchievements : MonoBehaviour
 {
     public Text text;
     int score = 0;
     
     public void Increment()
     {
-        Achievements.Increment(GPGSIds.achievement_veteran);
+        //Achievements.Increment(GPGSIds.achievement_veteran);
     }
 
     public void Reveal()
     {
-        Achievements.Reveal(GPGSIds.achievement_rich_man);
+        //Achievements.Reveal(GPGSIds.achievement_rich_man);
     }
 
     public void Unlock()
     {
-        Achievements.Unlock(GPGSIds.achievement_good_start);
+        //Achievements.Unlock(GPGSIds.achievement_good_start);
     }
 
     public void ShowUI()
@@ -29,7 +29,7 @@ public class TestAch : MonoBehaviour
 
     public void PostScore()
     {
-        Leaderboards.ReportScore(GPGSIds.leaderboard_distance, score);
+        //Leaderboards.ReportScore(GPGSIds.leaderboard_distance, score);
     }
 
     public void AddScore()
@@ -47,5 +47,15 @@ public class TestAch : MonoBehaviour
     public void ShowLeaderboards()
     {
         Leaderboards.ShowUI();
+    }
+    
+    public void Ads()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("AdsTest");
+    }
+    
+    public void Shop()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ShopTest");
     }
 }

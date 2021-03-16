@@ -24,11 +24,9 @@
 
 public static class GPGSIds
 {
-        public const string achievement_traveler = "CgkIif_k38wQEAIQAw"; // <GPGSID>
-        public const string achievement_good_start = "CgkIif_k38wQEAIQAg"; // <GPGSID>
-        public const string achievement_veteran = "CgkIif_k38wQEAIQBQ"; // <GPGSID>
-        public const string leaderboard_distance = "CgkIif_k38wQEAIQAQ"; // <GPGSID>
-        public const string achievement_rich_man = "CgkIif_k38wQEAIQBA"; // <GPGSID>
+        public const string achievement_osiagniecie_wieloetapowe = "CgkI2NXYl_0NEAIQAQ"; // <GPGSID>
+        public const string achievement_osiagniecie = "CgkI2NXYl_0NEAIQAA"; // <GPGSID>
+        public const string achievement_ukryta_odznaka = "CgkI2NXYl_0NEAIQAg"; // <GPGSID>
 
 }
 

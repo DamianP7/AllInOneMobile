@@ -1,8 +1,7 @@
-﻿using GoogleMobileAds.Api;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace AllInOneMobile
+namespace AllInOneMobile.Editor
 {
 	/// <summary>
 	/// Editor's tab responsible for displaying information about ads.
@@ -42,64 +41,49 @@ namespace AllInOneMobile
 
 		public void Save()
 		{
+#if ADS
 			switch (bannerSize)
 			{
 				case BannerSize.Banner:
-					settings.bannerSize = AdSize.Banner;
+					settings.bannerSize = GoogleMobileAds.Api.AdSize.Banner;
 					break;
 				case BannerSize.MediumRectangle:
-					settings.bannerSize = AdSize.MediumRectangle;
+					settings.bannerSize = GoogleMobileAds.Api.AdSize.MediumRectangle;
 					break;
 				case BannerSize.IABBanner:
-					settings.bannerSize = AdSize.IABBanner;
+					settings.bannerSize = GoogleMobileAds.Api.AdSize.IABBanner;
 					break;
 				case BannerSize.Leaderboard:
-					settings.bannerSize = AdSize.Leaderboard;
+					settings.bannerSize = GoogleMobileAds.Api.AdSize.Leaderboard;
 					break;
 				case BannerSize.SmartBanner:
-					settings.bannerSize = AdSize.SmartBanner;
+					settings.bannerSize = GoogleMobileAds.Api.AdSize.SmartBanner;
 					break;
 				case BannerSize.Custom:
-					settings.bannerSize = new AdSize(bannerWidth, bannerHeight);
+					settings.bannerSize = new GoogleMobileAds.Api.AdSize(bannerWidth, bannerHeight);
 					break;
 			}
+#endif
 		}
 
 		public void ShowTab()
 		{
-			GUILayout.Label("Ads (AdMob)", EditorStyles.boldLabel);
+			settings.useAdMob = EditorGUILayout.Toggle(new GUIContent("Enable AdMob"), settings.useAdMob);
+			if (!settings.useAdMob) return;
+
 			if (!adsInstalled) // if can't find plugin - show download button
 			{
-				if (GUILayout.Button("Download plugin"))
+				if (GUILayout.Button("Download Google Mobile Ads plugin", GUILayout.Height(30)))
 				{
 					Application.OpenURL("https://github.com/googleads/googleads-mobile-unity/releases/tag/v5.3.0");
 				}
-
 				return;
 			}
 
-			settings.useAdMob = EditorGUILayout.Toggle(new GUIContent("Use AdMob"), settings.useAdMob);
-
-			if (!settings.useAdMob) return;
-
-			adIDs = EditorGUILayout.Foldout(adIDs, "Application ID", true);
-			if (adIDs)
-			{
-				EditorGUI.indentLevel++;
-				settings.androidID = EditorGUILayout.TextField(new GUIContent("Android ID"), settings.androidID);
-
-				if (settings.androidID == "")
-					EditorGUILayout.HelpBox(
-						"AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713",
-						MessageType.Info);
-				else if (!CheckAdsIDFormat(settings.androidID))
-					EditorGUILayout.HelpBox(
-						"AdMob App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713",
-						MessageType.Error);
-
-				EditorGUI.indentLevel--;
-			}
-
+				EditorGUILayout.HelpBox(
+					"Remember about AdMob App ID.\nYou need to paste it in Assets/Google Mobile Ads/Settings...",
+					MessageType.Info);
+				
 			adBaner = EditorGUILayout.Foldout(adBaner, "Baner", true);
 			if (adBaner)
 			{
@@ -169,8 +153,10 @@ namespace AllInOneMobile
 			EditorGUI.EndDisabledGroup();
 
 			EditorGUILayout.Separator();
-
-			settings.adPosition = (AdPosition) EditorGUILayout.EnumPopup("Banner position", settings.adPosition);
+#if ADS
+			settings.adPosition = (GoogleMobileAds.Api.AdPosition)
+				EditorGUILayout.EnumPopup("Banner position", settings.adPosition);
+#endif
 		}
 
 		Vector2Int GetBannerSize(BannerSize bannerSize)

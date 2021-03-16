@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_PURCHASING
 using UnityEngine.Purchasing;
+#endif
 
 namespace AllInOneMobile
 {
-	public class InAppStore : Singleton<InAppStore>, IStoreListener
+	public class InAppStore : Singleton<InAppStore>
+#if UNITY_PURCHASING
+		, IStoreListener
 	{
 		static IStoreController storeController;
 		static IExtensionProvider storeExtensionProvider;
 
-		public Dictionary<AddedProduct, Action> ActionOnPurchaseSucces = new Dictionary<AddedProduct, Action>();
+		public Dictionary<AddedProduct, Action> ActionOnPurchaseSuccess = new Dictionary<AddedProduct, Action>();
 
 		void Start()
 		{
@@ -22,6 +26,11 @@ namespace AllInOneMobile
 
 		public void InitializePurchasing()
 		{
+			if (!AllInOneMobileSettings.Instance.useInAppPurchases)
+			{
+				Debug.LogError("InApp-Purchases are disabled.");
+				return;
+			}
 			if (IsInitialized())
 			{
 				return;
@@ -44,6 +53,11 @@ namespace AllInOneMobile
 
 		public void BuyProduct(AddedProduct addedProduct)
 		{
+			if (!AllInOneMobileSettings.Instance.useInAppPurchases)
+			{
+				Debug.LogError("InApp-Purchases are disabled.");
+				return;
+			}
 			string id = AllInOneMobileSettings.Instance.products.Find(x => x.name == addedProduct.ToString()).id;
 			BuyProductID(id);
 		}
@@ -56,7 +70,7 @@ namespace AllInOneMobile
 
 				if (product != null && product.availableToPurchase)
 				{
-					Debug.Log(string.Format("Purchasing product asychronously: '{0}'", product.definition.id));
+					Debug.Log($"Purchasing product asychronously: '{product.definition.id}'");
 					storeController.InitiatePurchase(product);
 				}
 				else
@@ -76,6 +90,11 @@ namespace AllInOneMobile
 		/// </summary>
 		public void RestorePurchases()
 		{
+			if (!AllInOneMobileSettings.Instance.useInAppPurchases)
+			{
+				Debug.LogError("InApp-Purchases are disabled.");
+				return;
+			}
 			if (!IsInitialized())
 			{
 				Debug.Log("RestorePurchases FAIL. Not initialized.");
@@ -98,14 +117,15 @@ namespace AllInOneMobile
 			Debug.Log("OnInitializeFailed InitializationFailureReason:" + error);
 		}
 
-
 		public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
 		{
 			int index = AllInOneMobileSettings.Instance.products.FindIndex(x =>
 				x.id == args.purchasedProduct.definition.id);
 
-			if (ActionOnPurchaseSucces.ContainsKey((AddedProduct) index))
-				ActionOnPurchaseSucces[(AddedProduct) index].Invoke();
+			if (ActionOnPurchaseSuccess.ContainsKey((AddedProduct) index))
+				ActionOnPurchaseSuccess[(AddedProduct) index].Invoke();
+			else
+				Debug.LogError($"Product '{((AddedProduct) index).ToString()}' doesn't have assigned method");
 
 			Debug.Log($"ProcessPurchase: PASS. Product: '{args.purchasedProduct.definition.id}'");
 
@@ -116,8 +136,11 @@ namespace AllInOneMobile
 
 		public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
 		{
-			Debug.Log(string.Format("OnPurchaseFailed: FAIL. Product: '{0}', PurchaseFailureReason: {1}",
-				product.definition.storeSpecificId, failureReason));
+			Debug.Log(
+				$"OnPurchaseFailed: FAIL. Product: '{product.definition.storeSpecificId}', PurchaseFailureReason: {failureReason}");
 		}
+#else
+	{
+#endif
 	}
 }

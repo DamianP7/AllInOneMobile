@@ -15,9 +15,9 @@ public class TestShop : MonoBehaviour
 
     void Start()
     {
-        store.ActionOnPurchaseSucces.Add(AddedProduct.Przedmiot, BoughtConsumable);
-        store.ActionOnPurchaseSucces.Add(AddedProduct.Premium, BoughtNonConsumable);
-        store.ActionOnPurchaseSucces.Add(AddedProduct.Subskrypcja, BoughtSubsciption);
+        store.ActionOnPurchaseSuccess.Add(AddedProduct.Przedmiot, BoughtConsumable);
+        store.ActionOnPurchaseSuccess.Add(AddedProduct.Premium, BoughtNonConsumable);
+        store.ActionOnPurchaseSuccess.Add(AddedProduct.Subskrypcja, BoughtSubsciption);
     }
 
     public void BuyConsumable()
@@ -49,5 +49,15 @@ public class TestShop : MonoBehaviour
     void BoughtSubsciption()
     {
         subState.text = "Active";
+    }
+    
+    public void Services()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ServicesTest");
+    }
+    
+    public void Ads()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("AdsTest");
     }
 }

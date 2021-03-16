@@ -35,10 +35,15 @@ public class TestAds : MonoBehaviour
         rewardedText.text = "Rewarded: Loading";
     }
     
-    public void SetBanner(int ad)
+    public void SetBanner()
     {
-        ads.RequestBanner((AdPosition)ad);
+        ads.RequestBanner();
         ads.ShowBanner();
+    }
+
+    public void HideBanner()
+    {
+        ads.HideBanner();
     }
 
     public void ShowInterstitial()
@@ -108,5 +113,15 @@ public class TestAds : MonoBehaviour
     public void RewardedClosed()
     {
         rewardedText.text = "Rewareded: Closed";
+    }
+
+    public void Services()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ServicesTest");
+    }
+    
+    public void Shop()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ShopTest");
     }
 }

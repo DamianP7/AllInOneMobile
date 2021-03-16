@@ -250,7 +250,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: '{inproject}: user.keystore'
+  AndroidKeystoreName: H:/user.keystore
   AndroidKeyaliasName: pracad
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
@@ -647,7 +647,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    7: ADS_TEST
+    7: GPG;ADS;ADS_TEST
   platformArchitecture: {}
   scriptingBackend:
     Android: 1

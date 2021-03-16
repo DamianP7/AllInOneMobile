@@ -16,10 +16,9 @@ MonoBehaviour:
   useBaner: 1
   useInterstitial: 1
   useRewarded: 1
-  androidID: ca-app-pub-7227996699216990~1803354846
-  androidBaner: ca-app-pub-7227996699216990/3796105121
-  androidInterstitial: ca-app-pub-7227996699216990/2483023450
-  androidRewarded: ca-app-pub-7227996699216990/3157810875
+  androidBaner: 
+  androidInterstitial: 
+  androidRewarded: 
   adPosition: 0
   minSecondsBetweenAds: 0
   useAchievements: 1

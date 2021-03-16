@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace AllInOneMobile
+namespace AllInOneMobile.Editor
 {
 	/// <summary>
 	/// Plugin main window editor
@@ -11,20 +11,23 @@ namespace AllInOneMobile
 		bool adsInstalled = false;
 		const string adsPluginPath = "/Plugins/Android/googlemobileads-unity.aar";
 		bool achievementsInstalled = false;
-		const string achievementsPluginPath = "/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin/project.properties";
+
+		const string achievementsPluginPath =
+			"/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin/project.properties";
+
 		bool inAppPurchasesInstalled = false;
 		const string inAppPurchasesPath = "/Plugins/UnityPurchasing/Bin/Stores.dll";
-		bool analyticsInstalled = false;
-		const string analyticsPath = "/Firebase/Plugins/Firebase.Analytics.dll";
-		
+
 		AllInOneMobileSettings settings;
 
 		AdsTab adsTab;
-		AchievementsTab achievementsTab;
+		GameServicesTab gameServicesTab;
 		InAppStoreTab inAppStoreTab;
-		AnalyticsTab analyticsTab;
+		
+		int tab = 0;
 
-		#region Open/Close
+#region Open/Close
+
 		[MenuItem("AllInOne Mobile/Main Settings")]
 		public static void ShowWindow()
 		{
@@ -37,14 +40,12 @@ namespace AllInOneMobile
 			adsTab.adsInstalled = adsInstalled;
 
 			achievementsInstalled = System.IO.File.Exists(Application.dataPath + achievementsPluginPath);
-			achievementsTab.achievementsInstalled = achievementsInstalled;
+			gameServicesTab.achievementsInstalled = achievementsInstalled;
 
 			inAppPurchasesInstalled = System.IO.File.Exists(Application.dataPath + inAppPurchasesPath);
 			inAppStoreTab.inappsInstalled = inAppPurchasesInstalled;
 
-			analyticsInstalled = System.IO.File.Exists(Application.dataPath + analyticsPath);
-			analyticsTab.analyticsInstalled = analyticsInstalled;
-
+			SetDefineSymbols();
 		}
 
 		protected void OnEnable()
@@ -52,11 +53,12 @@ namespace AllInOneMobile
 			settings = AllInOneMobileSettings.Instance;
 
 			adsTab = new AdsTab(settings);
-			achievementsTab = new AchievementsTab(settings);
+			gameServicesTab = new GameServicesTab(settings);
 			inAppStoreTab = new InAppStoreTab(settings);
-			analyticsTab = new AnalyticsTab(settings);
 		}
-		#endregion
+
+#endregion
+
 
 		void OnGUI()
 		{
@@ -65,18 +67,42 @@ namespace AllInOneMobile
 			//groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
 			//Time.timeScale = EditorGUILayout.Slider("Time Scale", Time.timeScale, 0, 2);
 			//EditorGUILayout.EndToggleGroup();
+			tab = GUILayout.Toolbar(tab, new string[] {"Ads", "Game Services", "Store"});
+			switch (tab)
+			{
+				case 0:
+					adsTab.ShowTab();
+					break;
+				case 1:
+					gameServicesTab.ShowTab();
+					break;
+				case 2:
+					inAppStoreTab.ShowTab();
+					break;
+			}
 
-			adsTab.ShowTab();
-
-			achievementsTab.ShowTab();
-			
-			inAppStoreTab.ShowTab();
 
 			if (GUI.changed)
 			{
 				adsTab.Save();
 				settings.Save();
 			}
+		}
+
+		void SetDefineSymbols()
+		{
+			string s = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
+			if (adsInstalled && !s.Contains("ADS"))
+				s += ";ADS";
+			else if (!adsInstalled && s.Contains("ADS"))
+				s.Remove(s.IndexOf("ADS"), 3);
+
+			if (achievementsInstalled && !s.Contains("GPG"))
+				s += ";GPG";
+			else if (!achievementsInstalled && s.Contains("GPG"))
+				s.Remove(s.IndexOf("GPG"), 3);
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, s);
 		}
 	}
 }

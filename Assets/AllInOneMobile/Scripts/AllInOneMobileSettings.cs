@@ -1,20 +1,19 @@
 ﻿using System;
-using GoogleMobileAds.Api;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Purchasing;
 
 namespace AllInOneMobile
 {
 	public class AllInOneMobileSettings : ScriptableObject
 	{
 #region Instance
+
 		const string settingsDir = "Assets/AllInOneMobile";
 		const string settingsResourcesDir = "Assets/AllInOneMobile/Resources";
 		const string settingsFile = "Assets/AllInOneMobile/Resources/AllInOneMobileSettings.asset";
 		const string googleAdsSettings = "Assets/GoogleMobileAds/Resources/GoogleMobileAdsSettings.asset";
-		
+
 		static AllInOneMobileSettings instance;
 
 		public static AllInOneMobileSettings Instance
@@ -23,21 +22,7 @@ namespace AllInOneMobile
 			{
 				if (instance == null)
 				{
-#if UNITY_EDITOR
-					if (!AssetDatabase.IsValidFolder(settingsResourcesDir))
-					{
-						AssetDatabase.CreateFolder(settingsDir, "Resources");
-					}
-
-					instance = (AllInOneMobileSettings) AssetDatabase.LoadAssetAtPath(
-						settingsFile, typeof(AllInOneMobileSettings));
-
-					if (instance == null)
-					{
-						instance = CreateInstance<AllInOneMobileSettings>();
-						AssetDatabase.CreateAsset(instance, settingsFile);
-					}
-#endif
+					instance = Resources.Load<AllInOneMobileSettings>("AllInOneMobileSettings");
 				}
 
 				return instance;
@@ -56,6 +41,7 @@ namespace AllInOneMobile
 #endregion
 
 #region Ads Settings
+
 		public string AndroidBaner
 		{
 #if ADS_TEST
@@ -91,13 +77,13 @@ namespace AllInOneMobile
 		public bool useInterstitial = false;
 		public bool useRewarded = false;
 
-		public string androidID = "";
 		public string androidBaner;
 		public string androidInterstitial;
 		public string androidRewarded;
-
-		public AdSize bannerSize;
-		public AdPosition adPosition;
+#if ADS
+		public GoogleMobileAds.Api.AdSize bannerSize;
+		public GoogleMobileAds.Api.AdPosition adPosition;
+#endif
 		public int minSecondsBetweenAds;
 
 #endregion
@@ -121,6 +107,8 @@ namespace AllInOneMobile
 	{
 		public string name;
 		public string id;
-		public ProductType productType;
+#if UNITY_PURCHASING
+		public UnityEngine.Purchasing.ProductType productType;
+#endif
 	}
 }

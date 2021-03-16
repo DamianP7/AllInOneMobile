@@ -7,9 +7,10 @@ namespace AllInOneMobile.Utils
 	{
 		[MenuItem("AllInOne Mobile/Create/Store Manager")]
 		static void InstantiateStore()
-		{              
+		{
 			GameObject go = new GameObject("StoreManager");
 			go.AddComponent<InAppStore>();
+			Selection.activeGameObject = go;
 		}
 
 		[MenuItem("AllInOne Mobile/Create/Ads Manager")]
@@ -17,6 +18,7 @@ namespace AllInOneMobile.Utils
 		{
 			GameObject go = new GameObject("AdsManager");
 			go.AddComponent<Ads>();
+			Selection.activeGameObject = go;
 		}
 	}
 }
