@@ -86,8 +86,6 @@ namespace AllInOneMobile.Editor
 				name = line.Substring(0, line.IndexOf('=') - 1); // get name
 				line = line.Remove(0, name.Length + 4); // remove name
 				id = line.Substring(0, line.IndexOf('\"')); // get id
-
-				Debug.Log(type);
 				
 				if (type == "leaderboard")
 					leaderboards.Add(name, id);

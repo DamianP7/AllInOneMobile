@@ -352,7 +352,7 @@ namespace AllInOneMobile
 		void RequestRewardBasedVideo()
 		{
 #if UNITY_ANDROID
-			string adUnitId = allInOneMobileSettings.androidRewarded;
+			string adUnitId = allInOneMobileSettings.AndroidRewarded;
 #else
 			string adUnitId = "unexpected_platform";
 #endif

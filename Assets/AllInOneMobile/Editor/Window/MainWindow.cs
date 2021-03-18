@@ -36,6 +36,9 @@ namespace AllInOneMobile.Editor
 
 		void OnFocus()
 		{
+			if(adsTab == null || gameServicesTab == null || inAppStoreTab == null)
+				OnEnable();
+				
 			adsInstalled = System.IO.File.Exists(Application.dataPath + adsPluginPath);
 			adsTab.adsInstalled = adsInstalled;
 

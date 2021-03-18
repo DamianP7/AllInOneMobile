@@ -27,6 +27,7 @@ public static class GPGSIds
         public const string achievement_osiagniecie_wieloetapowe = "CgkI2NXYl_0NEAIQAQ"; // <GPGSID>
         public const string achievement_osiagniecie = "CgkI2NXYl_0NEAIQAA"; // <GPGSID>
         public const string achievement_ukryta_odznaka = "CgkI2NXYl_0NEAIQAg"; // <GPGSID>
+        public const string leaderboard_tabela = "CgkI2NXYl_0NEAIQAw"; // <GPGSID>
 
 }
 

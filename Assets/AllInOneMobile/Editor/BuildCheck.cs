@@ -25,7 +25,9 @@ namespace AllInOneMobile.Utils
 					Debug.LogWarning("Manager will display test ads");
 #else
 				if (EditorUserBuildSettings.development)
-					Debug.LogError("Manager will display real ads");
+				{
+					throw new BuildFailedException("Manager will display real ads");
+				}
 				else
 					Debug.Log("Manager will display real ads");
 #endif

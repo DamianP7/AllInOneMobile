@@ -647,7 +647,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    7: GPG;ADS;ADS_TEST
+    7: GPG;ADS
   platformArchitecture: {}
   scriptingBackend:
     Android: 1
